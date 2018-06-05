@@ -285,6 +285,13 @@ public:
   bool inputKinematicsYAML(const std::string& file_path);
 
   /**
+   * Input ros_controllers.yaml file for editing its values
+   * @param file_path path to ros_controllers.yaml in the input package
+   * @return bool if the file was read correctly
+   */
+  bool inputROSControllersYAML(const std::string& file_path);
+
+  /**
    * Set package path; try to resolve path from package name if directory does not exist
    * @param pkg_path path to package or package name
    * @return bool if the path was set

@@ -1016,6 +1016,54 @@ bool MoveItConfigData::inputKinematicsYAML(const std::string& file_path)
 }
 
 // ******************************************************************************************
+// Input ros_controllers.yaml file
+// ******************************************************************************************
+bool MoveItConfigData::inputROSControllersYAML(const std::string& file_path)
+{
+  const std::string& g_name;
+  // Load file
+  std::ifstream input_stream(file_path.c_str());
+  if (!input_stream.good())
+  {
+    ROS_ERROR_STREAM_NAMED("setup_assistant", "Unable to open file for reading " << file_path);
+    return false;
+  }
+
+  // Begin parsing
+  try
+  {
+    YAML::Node doc = YAML::Load(input_stream);
+  // position_trajectory_controller:
+  // type: position_controllers/JointTrajectoryController
+  // name: g1_controller
+  // joints:
+  //   - shoulder_pan_joint
+  //   - shoulder_lift_joint
+  // name: g2_controller
+  // joints:
+  //   - wrist_2_joint
+  //   - wrist_3_joint
+
+    // Loop through all controllers
+    for (YAML::const_iterator controller_it = doc.begin(); controller_it != doc.end(); ++controller_it)
+    {
+      const std::string& controller_name = controller_it->first.as<std::string>();
+      const YAML::Node& controller = controller_it->second;
+
+      parse(controller, "name", g_name);
+      ROS_INFO("group_name" << g_name);
+    }
+  }
+  catch (YAML::ParserException& e)  // Catch errors
+  {
+    ROS_ERROR_STREAM(e.what());
+    return false;
+  }
+
+  return true;  // file created successfully
+}
+
+// ******************************************************************************************
 // Set package path; try to resolve path from package name if directory does not exist
 // ******************************************************************************************
 bool MoveItConfigData::setPackagePath(const std::string& pkg_path)

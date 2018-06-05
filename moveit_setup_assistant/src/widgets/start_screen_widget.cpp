@@ -431,6 +431,17 @@ bool StartScreenWidget::loadExistingFiles()
                              .append(kinematics_yaml_path.make_preferred().native().c_str()));
   }
 
+  // Load ros_controllers yaml file if available --------------------------------------------------
+  fs::path controllers_yaml_path = config_data_->config_pkg_path_;
+  controllers_yaml_path /= "config/ros_controllers.yaml";
+
+  if (!config_data_->inputROSControllersYAML(controllers_yaml_path.make_preferred().native().c_str()))
+  {
+    QMessageBox::warning(this, "No ROS Controllers YAML File",
+                         QString("Failed to parse ros_controllers yaml file. This file is not critical but any previous "
+                                 "ros_controllers settings have been lost."));
+  }
+
   fs::path ompl_yaml_path = config_data_->config_pkg_path_;
   ompl_yaml_path /= "config/ompl_planning.yaml";
   config_data_->inputOMPLYAML(ompl_yaml_path.make_preferred().native().c_str());
