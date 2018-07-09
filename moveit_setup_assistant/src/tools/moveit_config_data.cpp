@@ -1394,9 +1394,9 @@ srdf::Model::Group* MoveItConfigData::findGroupByName(const std::string& name)
 }
 
 // ******************************************************************************************
-// Find controller by name
+// Find ros controller by name
 // ******************************************************************************************
-ROSControlConfig* MoveItConfigData::findROSControllerByName(const std::string& controller_name)
+ROSControlConfig* MoveItConfigData::findROSController(const std::string& controller_name)
 {
   // Find the ROSController we are editing based on the ROSController name string
   ROSControlConfig* searched_ros_controller = NULL;  // used for holding our search results
@@ -1415,6 +1415,24 @@ ROSControlConfig* MoveItConfigData::findROSControllerByName(const std::string& c
 }
 
 // ******************************************************************************************
+// Deletes a ros controller by name
+// ******************************************************************************************
+bool MoveItConfigData::deleteROSController(const std::string& controller_name)
+{
+  for (std::vector<ROSControlConfig>::iterator controller_it = ros_controllers_config_.begin();
+       controller_it != ros_controllers_config_.end(); ++controller_it)
+  {
+    if (controller_it->name_ == controller_name)  // string match
+    {
+      ros_controllers_config_.erase(controller_it);
+      // we are done searching
+      return true;
+    }
+  }
+  return false;
+}
+
+// ******************************************************************************************
 // Adds a ros controller to ros_controllers_config_ vector
 // ******************************************************************************************
 bool MoveItConfigData::addROSController(const ROSControlConfig& new_controller)
@@ -1423,7 +1441,7 @@ bool MoveItConfigData::addROSController(const ROSControlConfig& new_controller)
   ROSControlConfig* searched_ros_controller = NULL;
 
   // Find if there is an existing controller with the same name
-  searched_ros_controller = findROSControllerByName(new_controller.name_);
+  searched_ros_controller = findROSController(new_controller.name_);
 
   if (searched_ros_controller != NULL)
     return false;

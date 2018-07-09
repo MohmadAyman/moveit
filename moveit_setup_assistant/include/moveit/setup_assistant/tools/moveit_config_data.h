@@ -256,14 +256,6 @@ public:
    */
   srdf::Model::Group* findGroupByName(const std::string& name);
 
-  /**
-   * Find the associated ros controller by name
-   *
-   * @param name - name of data to find in datastructure
-   * @return pointer to data in datastructure
-   */
-  ROSControlConfig* findROSControllerByName(const std::string& controller_name);
-
   /// Load the allowed collision matrix from the SRDF's list of link pairs
   void loadAllowedCollisionMatrix();
 
@@ -369,6 +361,22 @@ public:
    * \return std::vector of ROSControlConfig
    */
   std::vector<ROSControlConfig> getROSControllers();
+
+  /**
+   * Find the associated ros controller by name
+   *
+   * @param controller_name - name of ros controller to find in datastructure
+   * @return pointer to data in datastructure
+   */
+  ROSControlConfig* findROSController(const std::string& controller_name);
+
+  /**
+   * delete ros controller by name
+   *
+   * @param controller_name - name of ros controller to delete
+   * @return true if deleted, false if not found
+   */
+  bool deleteROSController(const std::string& controller_name);
 
   /**
    * \brief Custom std::set comparator, used for sorting the joint_limits.yaml file into alphabetical order
