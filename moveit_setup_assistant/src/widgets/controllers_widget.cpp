@@ -200,8 +200,8 @@ void ROSControllersWidget::loadControllersTree()
   controllers_tree_->clear();                   // reset the tree
 
   // Display all controllers by looping through them
-  for (std::vector<ROSControlConfig>::const_iterator controller_it = config_data_->getROSControllers().begin();
-       controller_it != config_data_->getROSControllers().end(); ++controller_it)
+  for (std::vector<ROSControlConfig>::iterator controller_it = config_data_->getROSControllers()->begin();
+       controller_it != config_data_->getROSControllers()->end(); ++controller_it)
   {
     loadToControllersTree(*controller_it);
   }
@@ -243,15 +243,12 @@ void ROSControllersWidget::loadToControllersTree(const ROSControlConfig& control
     for (std::vector<std::string>::const_iterator joint_it = controller_it.joints_.begin();
          joint_it != controller_it.joints_.end(); ++joint_it)
     {
-      QTreeWidgetItem* j = new QTreeWidgetItem(joints);
-      j->setData(0, Qt::UserRole, QVariant::fromValue(2));
-      std::string joint_name;
-
-      joint_name = *joint_it;
+      QTreeWidgetItem* joint_item = new QTreeWidgetItem(joints);
+      joint_item->setData(0, Qt::UserRole, QVariant::fromValue(2));
 
       // Add to tree
-      j->setText(0, joint_name.c_str());
-      joints->addChild(j);
+      joint_item->setText(0, (*joint_it).c_str());
+      joints->addChild(joint_item);
     }
   }
 }
@@ -392,30 +389,7 @@ void ROSControllersWidget::addController()
 // ******************************************************************************************
 void ROSControllersWidget::addDefaultControllers()
 {
-  // Loop through groups
-  for (std::vector<srdf::Model::Group>::const_iterator group_it = config_data_->srdf_->groups_.begin();
-       group_it != config_data_->srdf_->groups_.end(); ++group_it)
-  {
-    ROSControlConfig group_controller;
-    // Get list of associated joints
-    const robot_model::JointModelGroup* joint_model_group =
-        config_data_->getRobotModel()->getJointModelGroup(group_it->name_);
-    const std::vector<const robot_model::JointModel*>& joint_models = joint_model_group->getActiveJointModels();
-
-    // Iterate through the joints
-    for (const robot_model::JointModel* joint : joint_models)
-    {
-      if (joint->isPassive() || joint->getMimic() != NULL || joint->getType() == robot_model::JointModel::FIXED)
-        continue;
-      group_controller.joints_.push_back(joint->getName());
-    }
-    if (!group_controller.joints_.empty())
-    {
-      group_controller.name_ = group_it->name_ + "_controller";
-      group_controller.type_ = "FollowJointTrajectory";
-      config_data_->addROSController(group_controller);
-    }
-  }
+  config_data_->addDefaultControllers();
   loadControllersTree();
 }
 
@@ -662,8 +636,8 @@ bool ROSControllersWidget::saveControllerScreen()
   }
 
   // Check that the controller name is unique
-  for (std::vector<ROSControlConfig>::const_iterator controller_it = config_data_->getROSControllers().begin();
-       controller_it != config_data_->getROSControllers().end(); ++controller_it)
+  for (std::vector<ROSControlConfig>::const_iterator controller_it = config_data_->getROSControllers()->begin();
+       controller_it != config_data_->getROSControllers()->end(); ++controller_it)
   {
     if (controller_it->name_.compare(controller_name_) == 0)  // the names are the same
     {

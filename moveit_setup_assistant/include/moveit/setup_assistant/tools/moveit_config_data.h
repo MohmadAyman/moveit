@@ -358,9 +358,9 @@ public:
 
   /**
    * \brief Gets ros_controllers_config_ vector
-   * \return std::vector of ROSControlConfig
+   * \return pointer to ros_controllers_config_
    */
-  std::vector<ROSControlConfig> getROSControllers();
+  std::vector<ROSControlConfig>* getROSControllers();
 
   /**
    * Find the associated ros controller by name

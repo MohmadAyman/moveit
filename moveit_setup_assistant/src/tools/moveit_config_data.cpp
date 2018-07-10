@@ -1452,9 +1452,9 @@ bool MoveItConfigData::addROSController(const ROSControlConfig& new_controller)
 // ******************************************************************************************
 // Gets ros_controllers_config_ vector
 // ******************************************************************************************
-std::vector<ROSControlConfig> MoveItConfigData::getROSControllers()
+std::vector<ROSControlConfig>* MoveItConfigData::getROSControllers()
 {
-  return ros_controllers_config_;
+  return &ros_controllers_config_;
 }
 
 }  // namespace
