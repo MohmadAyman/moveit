@@ -571,37 +571,37 @@ std::vector<OMPLPlannerDescription> MoveItConfigData::getOMPLPlanners()
 // ******************************************************************************************
 // Helper function to write the FollowJointTrajectory for each planning group to ros_controller.yaml.
 // ******************************************************************************************
-void MoveItConfigData::outputFollowJointTrajectoryYAML(YAML::Emitter& emitter)
+void MoveItConfigData::outputFollowJointTrajectoryYAML(YAML::Emitter& emitter, std::vector<ROSControlConfig>* ros_controllers_config_copy)
 {
   // Write default controllers
   emitter << YAML::Key << "controller_list";
   emitter << YAML::Value << YAML::BeginSeq;
   {
-    for (std::vector<ROSControlConfig>::iterator controller_it = ros_controllers_config_.begin();
-         controller_it != ros_controllers_config_.end();)
+    for (std::vector<ROSControlConfig>::iterator control_it = ros_controllers_config_copy->begin();
+         control_it != ros_controllers_config_copy->end();)
     {
       // Depending on the controller type, fill the required data
-      if (controller_it->type_ == "FollowJointTrajectory")
+      if (control_it->type_ == "FollowJointTrajectory")
       {
         emitter << YAML::BeginMap;
         emitter << YAML::Key << "name";
-        emitter << YAML::Value << controller_it->name_ + "_controller";
+        emitter << YAML::Value << control_it->name_;
         emitter << YAML::Key << "action_ns";
         emitter << YAML::Value << "follow_joint_trajectory";
         emitter << YAML::Key << "default";
         emitter << YAML::Value << "True";
         emitter << YAML::Key << "type";
-        emitter << YAML::Value << controller_it->type_;
+        emitter << YAML::Value << control_it->type_;
         // Write joints
         emitter << YAML::Key << "joints";
         {
-          if (controller_it->joints_.size() != 1)
+          if (control_it->joints_.size() != 1)
           {
             emitter << YAML::Value << YAML::BeginSeq;
 
             // Iterate through the joints
-            for (std::vector<std::string>::iterator joint_it = controller_it->joints_.begin();
-                 joint_it != controller_it->joints_.end(); ++joint_it)
+            for (std::vector<std::string>::iterator joint_it = control_it->joints_.begin();
+                 joint_it != control_it->joints_.end(); ++joint_it)
             {
               emitter << *joint_it;
             }
@@ -610,16 +610,16 @@ void MoveItConfigData::outputFollowJointTrajectoryYAML(YAML::Emitter& emitter)
           else
           {
             emitter << YAML::Value << YAML::BeginMap;
-            emitter << controller_it->joints_[0];
+            emitter << control_it->joints_[0];
             emitter << YAML::EndMap;
           }
         }
-        ros_controllers_config_.erase(controller_it);
+        ros_controllers_config_copy->erase(control_it);
         emitter << YAML::EndMap;
       }
       else
       {
-        controller_it++;
+        control_it++;
       }
     }
     emitter << YAML::EndSeq;
@@ -631,6 +631,9 @@ void MoveItConfigData::outputFollowJointTrajectoryYAML(YAML::Emitter& emitter)
 // ******************************************************************************************
 bool MoveItConfigData::outputROSControllersYAML(const std::string& file_path)
 {
+  // Copy ros_control_config_ to a new vector to avoid modifying it
+  std::vector<ROSControlConfig> ros_controllers_config_copy(ros_controllers_config_);
+
   // Cache the joints' names.
   std::vector<std::vector<std::string>> planning_groups;
   std::vector<std::string> group_joints;
@@ -736,27 +739,27 @@ bool MoveItConfigData::outputROSControllersYAML(const std::string& file_path)
     }
 
     // This function writes FollowJointTrajectory controllers for each planning group to ros_controller.yaml.
-    outputFollowJointTrajectoryYAML(emitter);
+    outputFollowJointTrajectoryYAML(emitter, &ros_controllers_config_copy);
 
     {
-      for (std::vector<ROSControlConfig>::const_iterator controller_it = ros_controllers_config_.begin();
-           controller_it != ros_controllers_config_.end(); ++controller_it)
+      for (std::vector<ROSControlConfig>::const_iterator control_it = ros_controllers_config_copy.begin();
+           control_it != ros_controllers_config_copy.end(); ++control_it)
       {
-        emitter << YAML::Key << controller_it->name_;
+        emitter << YAML::Key << control_it->name_;
         emitter << YAML::Value << YAML::BeginMap;
         emitter << YAML::Key << "type";
-        emitter << YAML::Value << controller_it->type_;
+        emitter << YAML::Value << control_it->type_;
 
         // Write joints
         emitter << YAML::Key << "joints";
         {
-          if (controller_it->joints_.size() != 1)
+          if (control_it->joints_.size() != 1)
           {
             emitter << YAML::Value << YAML::BeginSeq;
 
             // Iterate through the joints
-            for (std::vector<std::string>::const_iterator joint_it = controller_it->joints_.begin();
-                 joint_it != controller_it->joints_.end(); ++joint_it)
+            for (std::vector<std::string>::const_iterator joint_it = control_it->joints_.begin();
+                 joint_it != control_it->joints_.end(); ++joint_it)
             {
               emitter << *joint_it;
             }
@@ -765,7 +768,7 @@ bool MoveItConfigData::outputROSControllersYAML(const std::string& file_path)
           else
           {
             emitter << YAML::Value << YAML::BeginMap;
-            emitter << controller_it->joints_[0];
+            emitter << control_it->joints_[0];
             emitter << YAML::EndMap;
           }
         }
@@ -774,8 +777,8 @@ bool MoveItConfigData::outputROSControllersYAML(const std::string& file_path)
         emitter << YAML::Value << YAML::BeginMap;
         {
           // Iterate through the joints
-          for (std::vector<std::string>::const_iterator joint_it = controller_it->joints_.begin();
-               joint_it != controller_it->joints_.end(); ++joint_it)
+          for (std::vector<std::string>::const_iterator joint_it = control_it->joints_.begin();
+               joint_it != control_it->joints_.end(); ++joint_it)
           {
             emitter << YAML::Key << *joint_it << YAML::Value << YAML::BeginMap;
             emitter << YAML::Key << "p";
@@ -1103,78 +1106,72 @@ bool MoveItConfigData::inputROSControllersYAML(const std::string& file_path)
     YAML::Node doc = YAML::Load(input_stream);
     // Read the robot name
 
-    for (YAML::const_iterator controller_it = doc.begin(); controller_it != doc.end(); ++controller_it)
+    for (YAML::const_iterator map_it = doc.begin(); map_it != doc.end(); ++map_it)
     {
-      if (controller_it->second.IsMap())
+      if (const YAML::Node& controllers = map_it->second)
       {
+        // Used in parsing controllers settings parameters
+        ROSControlConfig control_setting;
         // Loop through all controllers
-        if (const YAML::Node& controller = controller_it->second)
+        for (YAML::const_iterator control_it = controllers.begin(); control_it != controllers.end(); ++control_it)
         {
-          for (YAML::const_iterator it = controller.begin(); it != controller.end(); ++it)
+          // Follow Joint Trajectory action controllers
+          if (control_it->first.as<std::string>() == "controller_list")
           {
-            // Follow Joint Trajectory action controllers
-            if (it->first.as<std::string>() == "controller_list")
+            if (const YAML::Node& trajectory_controllers = control_it->second)
             {
-              if (const YAML::Node& trajectory_controllers = it->second)
+              for (std::size_t i = 0; i < trajectory_controllers.size(); ++i)
               {
-                // Verify the controllers are in a sequence
-                if (trajectory_controllers.IsSequence())
+                // Controller node
+                if (const YAML::Node& controller_node = trajectory_controllers[i])
                 {
-                  for (std::size_t i = 0; i < trajectory_controllers.size(); ++i)
+                  if (const YAML::Node& joints = controller_node["joints"])
                   {
-                    ROSControlConfig setting;
-                    // Controller node
-                    if (const YAML::Node& controller_node = trajectory_controllers[i])
+                    for (YAML::const_iterator joint_it = joints.begin(); joint_it != joints.end(); ++joint_it)
                     {
-                      if (const YAML::Node& joints = controller_node["joints"])
-                      {
-                        for (YAML::const_iterator it = joints.begin(); it != joints.end(); ++it)
-                        {
-                          setting.joints_.push_back(it->as<std::string>());
-                        }
-                        if (!parse(controller_node, "name", setting.name_))
-                        {
-                          ROS_ERROR_STREAM_NAMED("ros_controller.yaml", "ros_controllers.yaml not parsed correctly");
-                          return false;
-                        }
-                        if (!parse(controller_node, "type", setting.type_))
-                        {
-                          ROS_ERROR_STREAM_NAMED("ros_controller.yaml", "ros_controllers.yaml not parsed correctly");
-                          return false;
-                        }
-                        // All required fields parsed correctly
-                        ros_controllers_config_.push_back(setting);
-                      }
-                      else
-                      {
-                        ROS_ERROR_STREAM_NAMED("ros_controller.yaml", "ros_controllers.yaml not parsed correctly");
-                        return false;
-                      }
+                      control_setting.joints_.push_back(joint_it->as<std::string>());
                     }
+                    if (!parse(controller_node, "name", control_setting.name_))
+                    {
+                      ROS_ERROR_STREAM_NAMED("ros_controller.yaml", "ros_controllers.yaml not parsed correctly");
+                      return false;
+                    }
+                    if (!parse(controller_node, "type", control_setting.type_))
+                    {
+                      ROS_ERROR_STREAM_NAMED("ros_controller.yaml", "ros_controllers.yaml not parsed correctly");
+                      return false;
+                    }
+                    // All required fields parsed correctly
+                    ros_controllers_config_.push_back(control_setting);
+                    control_setting.joints_.clear();
+                  }
+                  else
+                  {
+                    ROS_ERROR_STREAM_NAMED("ros_controller.yaml", "ros_controllers.yaml not parsed correctly");
+                    return false;
                   }
                 }
               }
             }
-            else
+          }
+          else
+          {
+            const std::string& controller_name = control_it->first.as<std::string>();
+            if (const YAML::Node& joints = control_it->second["joints"])
             {
-              ROSControlConfig setting;
-              const std::string& controller_name = controller_it->first.as<std::string>();
-              if (const YAML::Node& joints = controller_it->second["joints"])
+              for (YAML::const_iterator joint_it = joints.begin(); joint_it != joints.end(); ++joint_it)
               {
-                if (joints.IsSequence())
-                {
-                  for (YAML::const_iterator it = joints.begin(); it != joints.end(); ++it)
-                  {
-                    setting.joints_.push_back(it->as<std::string>());
-                  }
-                }
+                control_setting.joints_.push_back(joint_it->as<std::string>());
               }
-              if (!setting.joints_.empty())
+            }
+            if (!control_setting.joints_.empty())
+            {
+              if (const YAML::Node& urdf_node = control_it->second["type"])
               {
-                if (const YAML::Node& urdf_node = controller_it->second["type"])
-                  setting.type_ = controller_it->second["type"].as<std::string>();
-                setting.name_ = controller_name;
-                ros_controllers_config_.push_back(setting);
+                control_setting.type_ = control_it->second["type"].as<std::string>();
+                control_setting.name_ = controller_name;
+                ros_controllers_config_.push_back(control_setting);
+                control_setting.joints_.clear();
               }
             }
           }
@@ -1401,12 +1398,12 @@ ROSControlConfig* MoveItConfigData::findROSController(const std::string& control
   // Find the ROSController we are editing based on the ROSController name string
   ROSControlConfig* searched_ros_controller = NULL;  // used for holding our search results
 
-  for (std::vector<ROSControlConfig>::iterator controller_it = ros_controllers_config_.begin();
-       controller_it != ros_controllers_config_.end(); ++controller_it)
+  for (std::vector<ROSControlConfig>::iterator control_it = ros_controllers_config_.begin();
+       control_it != ros_controllers_config_.end(); ++control_it)
   {
-    if (controller_it->name_ == controller_name)  // string match
+    if (control_it->name_ == controller_name)  // string match
     {
-      searched_ros_controller = &(*controller_it);  // convert to pointer from iterator
+      searched_ros_controller = &(*control_it);  // convert to pointer from iterator
       break;                                        // we are done searching
     }
   }
@@ -1419,12 +1416,12 @@ ROSControlConfig* MoveItConfigData::findROSController(const std::string& control
 // ******************************************************************************************
 bool MoveItConfigData::deleteROSController(const std::string& controller_name)
 {
-  for (std::vector<ROSControlConfig>::iterator controller_it = ros_controllers_config_.begin();
-       controller_it != ros_controllers_config_.end(); ++controller_it)
+  for (std::vector<ROSControlConfig>::iterator control_it = ros_controllers_config_.begin();
+       control_it != ros_controllers_config_.end(); ++control_it)
   {
-    if (controller_it->name_ == controller_name)  // string match
+    if (control_it->name_ == controller_name)  // string match
     {
-      ros_controllers_config_.erase(controller_it);
+      ros_controllers_config_.erase(control_it);
       // we are done searching
       return true;
     }

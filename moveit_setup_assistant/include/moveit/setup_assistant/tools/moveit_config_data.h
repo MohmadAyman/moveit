@@ -268,7 +268,7 @@ public:
   bool outputKinematicsYAML(const std::string& file_path);
   bool outputJointLimitsYAML(const std::string& file_path);
   bool outputFakeControllersYAML(const std::string& file_path);
-  void outputFollowJointTrajectoryYAML(YAML::Emitter& emitter);
+  void outputFollowJointTrajectoryYAML(YAML::Emitter& emitter, std::vector<ROSControlConfig>* ros_controllers_config_copy);
   bool outputROSControllersYAML(const std::string& file_path);
 
   /**

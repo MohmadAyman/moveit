@@ -120,7 +120,10 @@ private Q_SLOTS:
   /// Called from Double List widget to highlight a group
   void previewSelectedGroup(std::vector<std::string> groups);
 
-  void previewSelected();
+  /// Called when an item is seleceted from the controllers tree
+  void previewSelected(QTreeWidgetItem* selected_item, int column);
+
+  void itemSelectionChanged();
 
 private:
   // ******************************************************************************************
@@ -135,6 +138,8 @@ private:
 
   /// Edit controller
   QPushButton* btn_edit_;
+
+  QHBoxLayout* controls_layout_;
 
   DoubleListWidget* joints_widget_;
 

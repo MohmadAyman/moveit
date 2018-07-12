@@ -124,7 +124,7 @@ ControllerEditWidget::ControllerEditWidget(QWidget* parent, moveit_setup_assista
   QHBoxLayout* controls_layout = new QHBoxLayout();
 
   // Delete
-  btn_delete_ = new QPushButton("&Delete Group", this);
+  btn_delete_ = new QPushButton("&Delete Controller", this);
   btn_delete_->setMaximumWidth(200);
   connect(btn_delete_, SIGNAL(clicked()), this, SIGNAL(deleteController()));
   controls_layout->addWidget(btn_delete_);

@@ -139,49 +139,49 @@ QWidget* ROSControllersWidget::createContentsWidget()
   controllers_tree_ = new QTreeWidget(this);
   controllers_tree_->setHeaderLabel("Current Controllers");
   connect(controllers_tree_, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(editSelected()));
-  layout->addWidget(controllers_tree_);
-  connect(controllers_tree_, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(previewSelected()));
+  connect(controllers_tree_, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(previewSelected(QTreeWidgetItem*, int)));
+  connect(controllers_tree_, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
   layout->addWidget(controllers_tree_);
 
   // Bottom Controls -------------------------------------------------------------
 
-  QHBoxLayout* controls_layout = new QHBoxLayout();
+  controls_layout_ = new QHBoxLayout();
 
   // Expand/Contract controls
   QLabel* expand_controls = new QLabel(this);
   expand_controls->setText("<a href='expand'>Expand All</a> <a href='contract'>Collapse All</a>");
   connect(expand_controls, SIGNAL(linkActivated(const QString)), this, SLOT(alterTree(const QString)));
-  controls_layout->addWidget(expand_controls);
+  controls_layout_->addWidget(expand_controls);
 
   // Spacer
   QWidget* spacer = new QWidget(this);
   spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-  controls_layout->addWidget(spacer);
+  controls_layout_->addWidget(spacer);
 
   // Delete
-  QPushButton* btn_delete_ = new QPushButton("&Delete Controller", this);
+  btn_delete_ = new QPushButton("&Delete Controller", this);
   btn_delete_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   btn_delete_->setMaximumWidth(200);
   connect(btn_delete_, SIGNAL(clicked()), this, SLOT(deleteController()));
-  controls_layout->addWidget(btn_delete_);
-  controls_layout->setAlignment(btn_delete_, Qt::AlignRight);
+  controls_layout_->addWidget(btn_delete_);
+  controls_layout_->setAlignment(btn_delete_, Qt::AlignRight);
 
   // Add Controller Button
-  QPushButton* btn_add_ = new QPushButton("&Add Controller", this);
+  btn_add_ = new QPushButton("&Add Controller", this);
   btn_add_->setMaximumWidth(300);
   connect(btn_add_, SIGNAL(clicked()), this, SLOT(addController()));
-  controls_layout->addWidget(btn_add_);
-  controls_layout->setAlignment(btn_add_, Qt::AlignRight);
+  controls_layout_->addWidget(btn_add_);
+  controls_layout_->setAlignment(btn_add_, Qt::AlignRight);
 
   // Edit
-  QPushButton* btn_edit_ = new QPushButton("&Edit Selected", this);
+  btn_edit_ = new QPushButton("&Edit Selected", this);
   btn_edit_->setMaximumWidth(300);
   connect(btn_edit_, SIGNAL(clicked()), this, SLOT(editSelected()));
-  controls_layout->addWidget(btn_edit_);
-  controls_layout->setAlignment(btn_edit_, Qt::AlignRight);
+  controls_layout_->addWidget(btn_edit_);
+  controls_layout_->setAlignment(btn_edit_, Qt::AlignRight);
 
   // Add Controls to layout
-  layout->addLayout(controls_layout);
+  layout->addLayout(controls_layout_);
 
   // Set layout
   content_widget->setLayout(layout);
@@ -259,6 +259,8 @@ void ROSControllersWidget::loadToControllersTree(const ROSControlConfig& control
 void ROSControllersWidget::focusGiven()
 {
   // load controllers tree
+  btn_edit_->setEnabled(false);
+  btn_delete_->setEnabled(false);
   loadControllersTree();
 }
 
@@ -342,10 +344,6 @@ void ROSControllersWidget::deleteController()
     if (type_ == 0)
       controller_name = item->text(0).toUtf8().constData();
   }
-  else
-    current_edit_controller_.clear();
-  if (controller_name.empty())
-    return;
 
   // Confirm user wants to delete controller
   if (QMessageBox::question(this, "Confirm Controller Deletion",
@@ -364,6 +362,8 @@ void ROSControllersWidget::deleteController()
     ROS_WARN_STREAM_NAMED("Setup Assistnat", "Couldn't delete Controller ");
   }
   
+  current_edit_controller_.clear();
+
   // Switch to main screen
   showMainScreen();
 
@@ -495,10 +495,21 @@ void ROSControllersWidget::previewSelectedGroup(std::vector<std::string> groups)
 }
 
 // ******************************************************************************************
-// Called from Double List widget to highlight a subgroup
+// Called when an item is seleceted from the controllers tree
 // ******************************************************************************************
-void ROSControllersWidget::previewSelected()
+void ROSControllersWidget::previewSelected(QTreeWidgetItem* selected_item, int column)
 {
+  int type = selected_item->data(0, Qt::UserRole).value<int>();
+  btn_edit_->setEnabled(true);
+  // Get the user custom properties of the currently selected row
+  if (type == 0)
+  {
+    btn_delete_->setEnabled(true);
+  }
+  else
+  {
+    btn_delete_->setEnabled(false);
+  }
 }
 
 // ******************************************************************************************
@@ -789,6 +800,16 @@ void ROSControllersWidget::alterTree(const QString& link)
     controllers_tree_->expandAll();
   else
     controllers_tree_->collapseAll();
+}
+
+void ROSControllersWidget::itemSelectionChanged()
+{
+  QList<QTreeWidgetItem *> selscted_items = controllers_tree_->selectedItems();
+  if (selscted_items.size() == 0)
+  {
+    btn_edit_->setEnabled(false);
+    btn_delete_->setEnabled(false);
+  }
 }
 
 }  // namespace
