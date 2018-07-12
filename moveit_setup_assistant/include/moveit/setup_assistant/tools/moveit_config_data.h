@@ -88,16 +88,6 @@ struct OmplPlanningParameter
   std::string comment;  // comment briefly describing what this parameter does
 };
 
-/**
- * ROS Controllers settings which may be set in the config files
- */
-struct ROSControlConfig
-{
-  std::string name_;                 // controller name
-  std::string type_;                 // controller type
-  std::vector<std::string> joints_;  // joints controller by this controller
-};
-
 /** \brief This class describes the OMPL planners by name, type, and parameter list, used to create the
  * ompl_planning.yaml file */
 class OMPLPlannerDescription
@@ -133,6 +123,77 @@ public:
   std::vector<OmplPlanningParameter> parameter_list_;
   std::string name_;  // name of planner
   std::string type_;  // type of planner (geometric)
+};
+
+// Describe ROS Controllers settings which may be set in the config files
+// Example:
+    // ROSControlConfig ros_controller;
+    // ros_controller.setValues(name, type, joint);
+    // moveit_config_data::addROSController(ros_controller);
+class ROSControlConfig
+{
+public:
+
+  /** \brief Constructor
+   *  @param name: name of planner
+   *  @parameter type: type of planner
+   */
+  ROSControlConfig(const std::string& name, const std::string& type)
+  {
+    name_ = name;
+    type_ = type;
+  };
+
+  /** \brief Destructor */
+  ~ROSControlConfig()
+  {
+    joints_.clear();
+  };
+
+  /** \brief adds a parameter to the planner description
+   * @param name: name of parameter to add
+   * @parameter: value: value of parameter as a string
+   *  @parameter: value: value of parameter as a string
+   */
+  void setDetails(const std::string& name, const std::string& type)
+  {
+    name_ = name;
+    type_ = value;
+  }
+
+  /** \brief adds a parameter to the planner description
+   * @param name: name of parameter to add
+   * @parameter: value: value of parameter as a string
+   *  @parameter: value: value of parameter as a string
+   */
+  void addJoint(const std::string& joint)
+  {
+    joints_.push_back(joint);
+  }
+  
+  /** \brief adds a parameter to the planner description
+   * @param name: name of parameter to add
+   * @parameter: value: value of parameter as a string
+   *  @parameter: value: value of parameter as a string
+   */
+  std::vector<std::string> getJoints()
+  {
+    return joints_;
+  }
+
+  // /** \brief adds a parameter to the planner description
+  //  * @param name: name of parameter to add
+  //  * @parameter: value: value of parameter as a string
+  //  *  @parameter: value: value of parameter as a string
+  //  */
+  // void addToROSControlConfig()
+  // {
+  //   MoveItConfigData::ros_controllers_config_.push_back(this);
+  // }
+
+  std::string name_;                 // controller name
+  std::string type_;                 // controller type
+  std::vector<std::string> joints_;  // joints controller by this controller
 };
 
 MOVEIT_CLASS_FORWARD(MoveItConfigData);
@@ -349,18 +410,18 @@ public:
    */
   std::string appendPaths(const std::string& path1, const std::string& path2);
 
-  /**
-   * \brief Adds a ros controller to ros_controllers_config_ vector
-   * \param new_controller a new ROS Controller to add
-   * \return true if inserted correctly
-   */
-  bool addROSController(const ROSControlConfig& new_controller);
+  // /**
+  //  * \brief Adds a ros controller to ros_controllers_config_ vector
+  //  * \param new_controller a new ROS Controller to add
+  //  * \return true if inserted correctly
+  //  */
+  // bool addROSController(const std::string& name, const std::string& type, const std::vector<std::string>& joints);
 
   /**
    * \brief Gets ros_controllers_config_ vector
    * \return pointer to ros_controllers_config_
    */
-  std::vector<ROSControlConfig>* getROSControllers();
+  std::vector<ROSControlConfig*>* getROSControllers();
 
   /**
    * Find the associated ros controller by name
@@ -370,13 +431,13 @@ public:
    */
   ROSControlConfig* findROSController(const std::string& controller_name);
 
-  /**
-   * delete ros controller by name
-   *
-   * @param controller_name - name of ros controller to delete
-   * @return true if deleted, false if not found
-   */
-  bool deleteROSController(const std::string& controller_name);
+  // /**
+  //  * delete ros controller by name
+  //  *
+  //  * @param controller_name - name of ros controller to delete
+  //  * @return true if deleted, false if not found
+  //  */
+  // bool deleteROSController(const std::string& controller_name);
 
   /**
    * \brief Custom std::set comparator, used for sorting the joint_limits.yaml file into alphabetical order
@@ -402,7 +463,7 @@ private:
   robot_model::RobotModelConstPtr robot_model_const_;
 
   /// ROS Controllers config data
-  std::vector<ROSControlConfig> ros_controllers_config_;
+  std::vector<ROSControlConfig*> ros_controllers_config_;
 
   // Shared planning scene
   planning_scene::PlanningScenePtr planning_scene_;

@@ -1398,7 +1398,7 @@ ROSControlConfig* MoveItConfigData::findROSController(const std::string& control
   // Find the ROSController we are editing based on the ROSController name string
   ROSControlConfig* searched_ros_controller = NULL;  // used for holding our search results
 
-  for (std::vector<ROSControlConfig>::iterator control_it = ros_controllers_config_.begin();
+  for (std::vector<ROSControlConfig*>::iterator control_it = ros_controllers_config_.begin();
        control_it != ros_controllers_config_.end(); ++control_it)
   {
     if (control_it->name_ == controller_name)  // string match
@@ -1411,45 +1411,47 @@ ROSControlConfig* MoveItConfigData::findROSController(const std::string& control
   return searched_ros_controller;
 }
 
-// ******************************************************************************************
-// Deletes a ros controller by name
-// ******************************************************************************************
-bool MoveItConfigData::deleteROSController(const std::string& controller_name)
-{
-  for (std::vector<ROSControlConfig>::iterator control_it = ros_controllers_config_.begin();
-       control_it != ros_controllers_config_.end(); ++control_it)
-  {
-    if (control_it->name_ == controller_name)  // string match
-    {
-      ros_controllers_config_.erase(control_it);
-      // we are done searching
-      return true;
-    }
-  }
-  return false;
-}
+// // ******************************************************************************************
+// // Deletes a ros controller by name
+// // ******************************************************************************************
+// bool MoveItConfigData::deleteROSController(const std::string& controller_name)
+// {
+//   for (std::vector<ROSControlConfig>::iterator control_it = ros_controllers_config_.begin();
+//        control_it != ros_controllers_config_.end(); ++control_it)
+//   {
+//     if (control_it->name_ == controller_name)  // string match
+//     {
+//       ros_controllers_config_.erase(control_it);
+//       // we are done searching
+//       return true;
+//     }
+//   }
+//   return false;
+// }
 
-// ******************************************************************************************
-// Adds a ros controller to ros_controllers_config_ vector
-// ******************************************************************************************
-bool MoveItConfigData::addROSController(const ROSControlConfig& new_controller)
-{
-  // Used for holding our search results
-  ROSControlConfig* searched_ros_controller = NULL;
+// // ******************************************************************************************
+// // Adds a ros controller to ros_controllers_config_ vector
+// // ******************************************************************************************
+// bool MoveItConfigData::addROSController(const std::string& name, const std::string& type, const std::vector<std::string>& joints)
+// {
+//   // Used for holding our search results
+//   ROSControlConfig* searched_ros_controller = NULL;
 
-  // Find if there is an existing controller with the same name
-  searched_ros_controller = findROSController(new_controller.name_);
+//   // Find if there is an existing controller with the same name
+//   searched_ros_controller = findROSController(name);
 
-  if (searched_ros_controller != NULL)
-    return false;
-  ros_controllers_config_.push_back(new_controller);
-  return true;
-}
+//   if (searched_ros_controller != NULL)
+//     return false;
+//   ROSControlConfig* new_ros_controller = new ROSControlConfig();
+//   new_ros_controller.setDetails(name, type, joints);
+//   ros_controllers_config_.push_back(new_ros_controller);
+//   return true;
+// }
 
 // ******************************************************************************************
 // Gets ros_controllers_config_ vector
 // ******************************************************************************************
-std::vector<ROSControlConfig>* MoveItConfigData::getROSControllers()
+std::vector<ROSControlConfig*>* MoveItConfigData::getROSControllers()
 {
   return &ros_controllers_config_;
 }

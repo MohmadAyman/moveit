@@ -621,7 +621,7 @@ void ROSControllersWidget::saveControllerScreenEdit()
 }
 
 // ******************************************************************************************
-// Call when controller edit sceen is done and needs to be saved
+// Called when controller edit sceen is done and needs to be saved
 // ******************************************************************************************
 bool ROSControllersWidget::saveControllerScreen()
 {
@@ -642,7 +642,7 @@ bool ROSControllersWidget::saveControllerScreen()
   // Check if this is an existing controller
   if (!current_edit_controller_.empty())
   {
-    // Find the controller we are editing based on the goup name string
+    // Find the controller we are editing based on the controller name string
     searched_controller = config_data_->findROSController(current_edit_controller_);
   }
 
@@ -675,9 +675,6 @@ bool ROSControllersWidget::saveControllerScreen()
   }
   else
   {
-    // Remember old controller name and type
-    const std::string old_controller_name = searched_controller->name_;
-
     // Change controller name
     searched_controller->name_ = controller_name_;
     searched_controller->type_ = controller_type_;
