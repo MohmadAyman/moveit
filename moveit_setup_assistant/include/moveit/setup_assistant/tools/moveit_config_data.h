@@ -188,6 +188,9 @@ public:
   /// URDF robot model
   urdf::ModelSharedPtr urdf_model_;
 
+  /// URDF robot model string
+  std::string urdf_string_;
+
   // ******************************************************************************************
   // SRDF Data
   // ******************************************************************************************
@@ -279,6 +282,13 @@ public:
   bool outputFakeControllersYAML(const std::string& file_path);
   void outputFollowJointTrajectoryYAML(YAML::Emitter& emitter);
   bool outputROSControllersYAML(const std::string& file_path);
+
+  /**
+   * \brief Parses the existing urdf and constructs a string from it with the elements required by gazebo simulator
+   * added
+   * \ return true if parsed into string with no errors
+   */
+  std::string getGazeboCompatibleURDF();
 
   /**
    * \brief Set list of collision link pairs in SRDF; sorted; with optional filter
