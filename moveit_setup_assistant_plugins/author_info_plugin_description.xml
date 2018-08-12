@@ -1,0 +1,10 @@
+<library path="lib/libmoveit_author_info">
+
+  <class name="moveit_setup_assistant/AuthorInformationWidget"
+         type="moveit_setup_assistant::AuthorInformationWidget"
+         base_class_type="moveit_setup_assistant::SetupAssistantWidget">
+    <description>
+    </description>
+  </class>
+
+</library>

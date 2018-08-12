@@ -61,8 +61,12 @@ namespace moveit_setup_assistant
 // ******************************************************************************************
 // Outer User Interface for MoveIt Configuration Assistant
 // ******************************************************************************************
-SetupAssistantWidget::SetupAssistantWidget(QWidget* parent, boost::program_options::variables_map args)
-  : QWidget(parent)
+SetupAssistantWidget::SetupAssistantWidget()
+  : QWidget(NULL)
+{
+}
+
+void SetupAssistantWidget::initialize(QWidget* parent, boost::program_options::variables_map args)
 {
   rviz_manager_ = NULL;
   rviz_render_panel_ = NULL;
