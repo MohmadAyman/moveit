@@ -38,7 +38,7 @@
 #define MOVEIT_ROS_MOVEIT_SETUP_ASSISTANT_WIDGETS_AUTHOR_PLUGIN_H
 
 #include <moveit/setup_assistant/tools/moveit_config_data.h>
-#include </home/mh/ws_2/src/moveit/moveit_setup_assistant/src/widgets/setup_assistant_widget.h>
+#include </home/mh/ws_moveit/src/moveit/moveit_setup_assistant/src/widgets/setup_assistant_widget.h>
 
 namespace moveit_setup_assistant
 {
@@ -57,21 +57,21 @@ public:
   void initialize(QWidget* parent, moveit_setup_assistant::MoveItConfigDataPtr config_data);
 
 
-  QLineEdit* name_edit_;
+  // QLineEdit* name_edit_;
 
-  QLineEdit* email_edit_;
+  // QLineEdit* email_edit_;
 
-private Q_SLOTS:
+// private Q_SLOTS:
 
   // ******************************************************************************************
   // Slot Event Functions
   // ******************************************************************************************
-  void edited_name();
-  void edited_email();
+  // void edited_name();
+  // void edited_email();
 
-private:
-  /// Contains all the configuration data for the setup assistant
-  moveit_setup_assistant::MoveItConfigDataPtr config_data_;
+// private:
+//   /// Contains all the configuration data for the setup assistant
+//   moveit_setup_assistant::MoveItConfigDataPtr config_data_;
 };
 
 }  // namespace moveit_setup_assistant

@@ -48,7 +48,9 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QString>
-#include <pluginlib/class_loader.hpp>  // for loading all avail kinematic planners
+#include <pluginlib/class_loader.hpp>
+#include <class_loader/class_loader.h>
+
 // Rviz
 #include <rviz/render_panel.h>
 #include <rviz/visualization_manager.h>
@@ -363,19 +365,25 @@ void SetupAssistantWidget::progressPastStartScreen()
 //   ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
 // }
 
-pluginlib::ClassLoader<moveit_setup_assistant::SetupAssistantWidget> poly_loader("moveit_setup_assistant", "moveit_setup_assistant::SetupAssistantWidget");
+  // pluginlib::ClassLoader<moveit_setup_assistant::SetupAssistantWidget> poly_loader("moveit_setup_assistant", "moveit_setup_assistant::SetupAssistantWidget");
 
-try
-{
-  boost::shared_ptr<moveit_setup_assistant::SetupAssistantWidget> poly = poly_loader.createInstance("AuthorPlugin");
+  // try
+  // {
+  //   boost::shared_ptr<moveit_setup_assistant::SetupAssistantWidget> poly = poly_loader.createInstance("moveit_setup_assistant/AuthorPlugin");
 
-  //... use the polygon, boost::shared_ptr will automatically delete memory when it goes out of scope
-}
-catch(pluginlib::PluginlibException& ex)
-{
-  //handle the class failing to load
-  ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
-}
+  //   //... use the polygon, boost::shared_ptr will automatically delete memory when it goes out of scope
+  // }
+  // catch(pluginlib::PluginlibException& ex)
+  // {
+  //   //handle the class failing to load
+  //   ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
+  // }
+
+  class_loader::ClassLoader loader("libmoveit_author_plugin.so");
+
+
+  boost::shared_ptr<moveit_setup_assistant::SetupAssistantWidget> plugin = loader.createInstance<moveit_setup_assistant::SetupAssistantWidget>("moveit_setup_assistant/AuthorPlugin");
+  // plugin->initialize();
 
   // Configuration Files
   configuration_files_widget_ = new ConfigurationFilesWidget(this, config_data_);

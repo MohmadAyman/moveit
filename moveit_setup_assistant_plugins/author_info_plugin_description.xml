@@ -1,6 +1,6 @@
-<library path="libmoveit_author_info">
+<library path="libmoveit_author_plugin">
 
-  <class name="AuthorPlugin"
+  <class name="moveit_setup_assistant/AuthorPlugin"
          type="moveit_setup_assistant::AuthorPlugin"
          base_class_type="moveit_setup_assistant::SetupAssistantWidget">
     <description>

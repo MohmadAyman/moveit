@@ -23,6 +23,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend version_gte="1.11.2">pluginlib</build_depend>
+  <build_depend>moveit_ros_visualization</build_depend>
   <build_depend>moveit_core</build_depend>
   <build_depend>moveit_setup_assistant</build_depend>
   <build_depend>moveit_ros_planning</build_depend>
@@ -30,6 +31,7 @@
 
   <run_depend version_gte="1.11.2">pluginlib</run_depend>
   <run_depend>moveit_core</run_depend>
+  <run_depend>moveit_ros_visualization</run_depend>
   <run_depend>moveit_setup_assistant</run_depend>
   <run_depend>moveit_ros_planning</run_depend>
 
