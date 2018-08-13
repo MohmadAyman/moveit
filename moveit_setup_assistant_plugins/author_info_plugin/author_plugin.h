@@ -44,12 +44,34 @@ namespace moveit_setup_assistant
 {
 class AuthorPlugin : public SetupAssistantWidget
 {
+  Q_OBJECT
 public:
   // ******************************************************************************************
   // Public Functions
   // ******************************************************************************************
 
   AuthorPlugin();
+
+  ~AuthorPlugin();
+
+  void initialize(QWidget* parent, moveit_setup_assistant::MoveItConfigDataPtr config_data);
+
+
+  QLineEdit* name_edit_;
+
+  QLineEdit* email_edit_;
+
+private Q_SLOTS:
+
+  // ******************************************************************************************
+  // Slot Event Functions
+  // ******************************************************************************************
+  void edited_name();
+  void edited_email();
+
+private:
+  /// Contains all the configuration data for the setup assistant
+  moveit_setup_assistant::MoveItConfigDataPtr config_data_;
 };
 
 }  // namespace moveit_setup_assistant
