@@ -17,6 +17,8 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 find_package(catkin REQUIRED COMPONENTS
   moveit_ros_planning
+  moveit_core
+  moveit_setup_assistant
   moveit_ros_visualization
   rviz
   urdf
@@ -24,6 +26,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   srdfdom
 )
+
 include_directories(${catkin_INCLUDE_DIRS})
 link_directories(${catkin_LIBRARY_DIRS})
 
@@ -49,14 +52,13 @@ link_directories(${YAMLCPP_LIBRARY_DIRS})
 
 catkin_package(
   CATKIN_DEPENDS
+    moveit_setup_assistant
     moveit_ros_planning
     moveit_ros_visualization
 )
 
-
 set_target_properties(${MOVEIT_LIB_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION})
 
-target_link_libraries(${MOVEIT_LIB_NAME} 
-  ${Boost_LIBRARIES} ${QT_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(${MOVEIT_LIB_NAME} moveit_setup_assistant_widgets moveit_setup_assistant_tools ${YAMLCPP_LIBRARIES} ${Boost_LIBRARIES} ${QT_LIBRARIES} ${catkin_LIBRARIES})
 
 install(TARGETS ${MOVEIT_LIB_NAME} LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})

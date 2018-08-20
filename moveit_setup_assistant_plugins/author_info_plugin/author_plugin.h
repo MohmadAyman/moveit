@@ -34,11 +34,12 @@
 
 /* Author: Dave Coleman, Michael 'v4hn' Goerner */
 
-#ifndef MOVEIT_ROS_MOVEIT_SETUP_ASSISTANT_WIDGETS_AUTHOR_PLUGIN_H
-#define MOVEIT_ROS_MOVEIT_SETUP_ASSISTANT_WIDGETS_AUTHOR_PLUGIN_H
+#ifndef MOVEIT_ROS_MOVEIT_SETUP_ASSISTANT_PLUGINS_AUTHOR_PLUGIN_H
+#define MOVEIT_ROS_MOVEIT_SETUP_ASSISTANT_PLUGINS_AUTHOR_PLUGIN_H
 
-#include <moveit/setup_assistant/tools/moveit_config_data.h>
+// #include <moveit/setup_assistant/tools/moveit_config_data.h>
 #include </home/mh/ws_moveit/src/moveit/moveit_setup_assistant/src/widgets/setup_assistant_widget.h>
+#include <moveit/robot_state_rviz_plugin/robot_state_display.h>
 
 namespace moveit_setup_assistant
 {
