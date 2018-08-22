@@ -312,76 +312,9 @@ void SetupAssistantWidget::progressPastStartScreen()
           SLOT(highlightGroup(const std::string&)));
   connect(perception_widget_, SIGNAL(unhighlightAll()), this, SLOT(unhighlightAll()));
 
-  // // Author Information
-  // author_information_widget_ = new AuthorInformationWidget(this, config_data_);
-  // main_content_->addWidget(author_information_widget_);
-  // connect(author_information_widget_, SIGNAL(isModal(bool)), this, SLOT(setModalMode(bool)));
-  // connect(author_information_widget_, SIGNAL(highlightLink(const std::string&, const QColor&)), this,
-  //         SLOT(highlightLink(const std::string&, const QColor&)));
-  // connect(author_information_widget_, SIGNAL(highlightGroup(const std::string&)), this,
-  //         SLOT(highlightGroup(const std::string&)));
-  // connect(author_information_widget_, SIGNAL(unhighlightAll()), this, SLOT(unhighlightAll()));
 
-  // moveit_setup_assistant::AuthorPlugin, moveit_setup_assistant::setup_assistant_widget      
-//   std::unique_ptr<pluginlib::ClassLoader<moveit_setup_assistant::SetupAssistantWidget>> loader;
-//   try
-//   {
-//     loader.reset(new pluginlib::ClassLoader<moveit_setup_assistant::SetupAssistantWidget>(
-//         "moveit_setup_assistant", "moveit_setup_assistant::SetupAssistantWidget"));
-//   }
-//   catch (pluginlib::PluginlibException& ex)
-//   {
-//     std::cout << "Exception while creating class loader " << ex.what() << std::endl;
-//   }
-
-//   const std::vector<std::string>& classes = loader->getDeclaredClasses();
-//   std::cout << "Available planning request adapter plugins:" << std::endl;
-//   for (std::size_t i = 0; i < classes.size(); ++i)
-//   {
-//     std::cout << " \t " << classes[i] << std::endl;
-//     moveit_setup_assistant::SetupAssistantWidget ad;
-//     // ad.initialize(this, config_data_);
-//     // main_content_->addWidget(ad);
-//     // try
-//     // {
-//     //   ad.reset(loader->createUnmanagedInstance(classes[i]));
-//     // }
-//     // catch (pluginlib::PluginlibException& ex)
-//     // {
-//     //   std::cout << " \t\t  Exception while planning adapter plugin '" << classes[i] << "': " << ex.what() << std::endl;
-//     // }
-//     // std::cout << std::endl << std::endl;
-//   }
-// // pluginlib::ClassLoader<moveit_setup_assistant::SetupAssistantWidget> poly_loader("moveit_setup_assistant", "moveit_setup_assistant::SetupAssistantWidget");
-
-// try
-// {
-//   boost::shared_ptr<moveit_setup_assistant::SetupAssistantWidget> poly = loader->createUnmanagedInstance("moveit_setup_assistant::AuthorPlugin");
-// }
-
-// catch(pluginlib::PluginlibException& ex)
-// {
-//   //handle the class failing to load
-//   ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
-// }
-
-  // pluginlib::ClassLoader<moveit_setup_assistant::SetupAssistantWidget> poly_loader("moveit_setup_assistant", "moveit_setup_assistant::SetupAssistantWidget");
-
-  // try
-  // {
-  //   boost::shared_ptr<moveit_setup_assistant::SetupAssistantWidget> poly = poly_loader.createInstance("moveit_setup_assistant/AuthorPlugin");
-
-  //   //... use the polygon, boost::shared_ptr will automatically delete memory when it goes out of scope
-  // }
-  // catch(pluginlib::PluginlibException& ex)
-  // {
-  //   //handle the class failing to load
-  //   ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
-  // }
-
+  // Load author info plugin
   class_loader::ClassLoader loader("libmoveit_author_plugin.so");
-
-
   boost::shared_ptr<moveit_setup_assistant::SetupAssistantWidget> plugin = loader.createInstance<moveit_setup_assistant::SetupAssistantWidget>("moveit_setup_assistant/AuthorPlugin");
   // plugin->initialize();
 

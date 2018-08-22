@@ -18,8 +18,9 @@ link_directories(${Boost_LIBRARY_DIRS})
 find_package(catkin REQUIRED COMPONENTS
   moveit_ros_planning
   moveit_core
-  moveit_setup_assistant
   moveit_ros_visualization
+  moveit_setup_assistant
+  moveit_setup_assistant_plugins
   rviz
   urdf
   rosconsole

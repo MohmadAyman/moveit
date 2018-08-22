@@ -10,7 +10,7 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-include_directories(include)
+include_directories(include src/widgets)
 
 find_package(Boost REQUIRED COMPONENTS thread filesystem system program_options)
 include_directories(${Boost_INCLUDE_DIRS})

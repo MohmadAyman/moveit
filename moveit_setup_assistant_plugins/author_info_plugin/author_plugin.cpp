@@ -55,24 +55,20 @@
 #include <iostream>  // For writing yaml and launch files
 #include <fstream>
 
-// plugin lib
-// #include <pluginlib/class_list_macros.h>
-
 #include <class_loader/class_loader.hpp>
-
 
 namespace moveit_setup_assistant
 {
 // Boost file system
 namespace fs = boost::filesystem;
 
-    // ******************************************************************************************
-    // Outer User Interface for MoveIt Configuration Assistant
-    // ******************************************************************************************
-    AuthorPlugin::AuthorPlugin()
-    {
-        ROS_ERROR_STREAM("Loaded the author plugin");
-    }
+  // ******************************************************************************************
+  // Outer User Interface for MoveIt Configuration Assistant
+  // ******************************************************************************************
+  AuthorPlugin::AuthorPlugin()
+  {
+    ROS_ERROR_STREAM("Loaded the author plugin");
+  }
 
   void AuthorPlugin::initialize(QWidget* parent, moveit_setup_assistant::MoveItConfigDataPtr config_data)
   {
@@ -107,11 +103,6 @@ namespace fs = boost::filesystem;
     // // Finish Layout --------------------------------------------------
     // this->setLayout(layout);
   }
-//   : SetupScreenWidget(parent), config_data_(config_data)
 
 }  // namespace
-// PLUGINLIB_EXPORT_CLASS(moveit_setup_assistant::AuthorPlugin, moveit_setup_assistant::SetupAssistantWidget)
 CLASS_LOADER_REGISTER_CLASS(moveit_setup_assistant::AuthorPlugin, moveit_setup_assistant::SetupAssistantWidget)
-
-
-// PLUGINLIB_EXPORT_CLASS(moveit_setup_assistant, moveit_setup_assistant::AuthorPlugin);
