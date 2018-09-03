@@ -36,73 +36,75 @@
 
 
 // Qt
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QMessageBox>
+// #include <QVBoxLayout>
+// #include <QPushButton>
+// #include <QMessageBox>
 #include <QApplication>
-#include <QSplitter>
+// #include <QSplitter>
 
 #include "author_plugin.h"
 
 // ROS
-#include <srdfdom/model.h>  // use their struct datastructures
-#include <ros/console.h>
-#include <ros/ros.h>
+// #include <srdfdom/model.h>  // use their struct datastructures
+// #include <ros/console.h>
+// #include <ros/ros.h>
 // Boost
-#include <boost/algorithm/string.hpp>  // for trimming whitespace from user input
-#include <boost/filesystem.hpp>        // for creating folders/files
-// Read write files
-#include <iostream>  // For writing yaml and launch files
-#include <fstream>
+// #include <boost/algorithm/string.hpp>  // for trimming whitespace from user input
 
 #include <class_loader/class_loader.hpp>
 
 namespace moveit_setup_assistant
 {
-// Boost file system
-namespace fs = boost::filesystem;
-
-  // ******************************************************************************************
-  // Outer User Interface for MoveIt Configuration Assistant
-  // ******************************************************************************************
-  AuthorPlugin::AuthorPlugin()
-  {
-    ROS_ERROR_STREAM("Loaded the author plugin");
-  }
+  AuthorPlugin::AuthorPlugin() : SetupAssistantWidget()
+  {}
 
   void AuthorPlugin::initialize(QWidget* parent, moveit_setup_assistant::MoveItConfigDataPtr config_data)
   {
-    // QVBoxLayout* layout = new QVBoxLayout();
-    // layout->setAlignment(Qt::AlignTop);
+    QVBoxLayout* layout = new QVBoxLayout();
+    layout->setAlignment(Qt::AlignTop);
 
-    // // Top Header Area ------------------------------------------------
+    // Top Header Area ------------------------------------------------
 
-    // HeaderWidget* header =
-    //     new HeaderWidget("Author Information", "Specify contact information of the author and initial maintainer of the "
-    //                                             "generated package. catkin requires valid details in the package's "
-    //                                             "package.xml",
-    //                     this);
-    // layout->addWidget(header);
+    HeaderWidget* header =
+        new HeaderWidget("Author Information", "Specify contact information of the author and initial maintainer of the "
+                                                "generated package. catkin requires valid details in the package's "
+                                                "package.xml",
+                        this);
+    layout->addWidget(header);
 
-    // QLabel* name_title = new QLabel(this);
-    // name_title->setText("Name of the maintainer this MoveIt! configuration:");
-    // layout->addWidget(name_title);
+    QLabel* name_title = new QLabel(this);
+    name_title->setText("Name of the maintainer this MoveIt! configuration:");
+    layout->addWidget(name_title);
 
-    // name_edit_ = new QLineEdit(this);
-    // connect(name_edit_, SIGNAL(editingFinished()), this, SLOT(edited_name()));
-    // layout->addWidget(name_edit_);
+    name_edit_ = new QLineEdit(this);
+    connect(name_edit_, SIGNAL(editingFinished()), this, SLOT(edited_name()));
+    layout->addWidget(name_edit_);
 
-    // QLabel* email_title = new QLabel(this);
-    // email_title->setText("Email of the maintainer of this MoveIt! configuration:");
-    // layout->addWidget(email_title);
+    QLabel* email_title = new QLabel(this);
+    email_title->setText("Email of the maintainer of this MoveIt! configuration:");
+    layout->addWidget(email_title);
 
-    // email_edit_ = new QLineEdit(this);
-    // connect(email_edit_, SIGNAL(editingFinished()), this, SLOT(edited_email()));
-    // layout->addWidget(email_edit_);
+    email_edit_ = new QLineEdit(this);
+    connect(email_edit_, SIGNAL(editingFinished()), this, SLOT(edited_email()));
+    layout->addWidget(email_edit_);
 
-    // // Finish Layout --------------------------------------------------
-    // this->setLayout(layout);
+    config_data_ = config_data;
+
+    // Finish Layout --------------------------------------------------
+    this->setLayout(layout);
   }
 
+  void AuthorPlugin::edited_name()
+  {
+    config_data_->author_name_ = this->name_edit_->text().toStdString();
+    config_data_->changes |= MoveItConfigData::AUTHOR_INFO;
+  }
+
+  void AuthorPlugin::edited_email()
+  {
+      config_data_->author_email_ = this->email_edit_->text().toStdString();
+  config_data_->changes |= MoveItConfigData::AUTHOR_INFO;
+
+  }
 }  // namespace
 CLASS_LOADER_REGISTER_CLASS(moveit_setup_assistant::AuthorPlugin, moveit_setup_assistant::SetupAssistantWidget)

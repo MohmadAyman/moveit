@@ -312,11 +312,10 @@ void SetupAssistantWidget::progressPastStartScreen()
           SLOT(highlightGroup(const std::string&)));
   connect(perception_widget_, SIGNAL(unhighlightAll()), this, SLOT(unhighlightAll()));
 
-
   // Load author info plugin
   class_loader::ClassLoader loader("libmoveit_author_plugin.so");
   boost::shared_ptr<moveit_setup_assistant::SetupAssistantWidget> plugin = loader.createInstance<moveit_setup_assistant::SetupAssistantWidget>("moveit_setup_assistant/AuthorPlugin");
-  // plugin->initialize();
+  // plugin->initialize(this, config_data_);
 
   // Configuration Files
   configuration_files_widget_ = new ConfigurationFilesWidget(this, config_data_);
