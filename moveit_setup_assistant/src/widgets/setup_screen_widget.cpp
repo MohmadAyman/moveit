@@ -45,3 +45,11 @@ bool SetupScreenWidget::focusLost()
 {
   return true;  // accept switching by default
 }
+
+void SetupScreenWidget::setParentWidget(QWidget* parent)
+{
+	this->setParent(parent);
+}
+
+void SetupScreenWidget::setParentWidget_(QWidget* parent, moveit_setup_assistant::MoveItConfigDataPtr config_data)
+{}

@@ -37,12 +37,17 @@
 #ifndef MOVEIT_ROS_MOVEIT_SETUP_ASSISTANT_PLUGINS_AUTHOR_PLUGIN_H
 #define MOVEIT_ROS_MOVEIT_SETUP_ASSISTANT_PLUGINS_AUTHOR_PLUGIN_H
 
+#include <QWidget>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <header_widget.h>
 #include <moveit/setup_assistant/tools/moveit_config_data.h>
-#include <setup_assistant_widget.h>
+#include <setup_screen_widget.h>
+
 
 namespace moveit_setup_assistant
 {
-class AuthorPlugin : public SetupAssistantWidget
+class AuthorPlugin : public SetupScreenWidget
 {
   Q_OBJECT
 public:
@@ -55,10 +60,12 @@ public:
   // ~AuthorPlugin();
 
   void initialize(QWidget* parent, moveit_setup_assistant::MoveItConfigDataPtr config_data);
+  virtual void focusGiven();
 
   QLineEdit* name_edit_;
   QLineEdit* email_edit_;
 
+  void setParentWidget_(QWidget* parent, moveit_setup_assistant::MoveItConfigDataPtr config_data);
 
 private Q_SLOTS:
 

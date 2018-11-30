@@ -94,11 +94,56 @@ void SetupAssistantWidget::initialize(QWidget* parent, boost::program_options::v
   middle_frame_->setLayout(main_content_);
 
   // Screens --------------------------------------------------------
+ if (!widget_plugin_loader_)
+  {
+    try
+    {
+      widget_plugin_loader_.reset(new pluginlib::ClassLoader<SetupScreenWidget>(
+          "moveit_setup_assistant", "SetupScreenWidget"));
+    }
+    catch (pluginlib::PluginlibException& ex)
+    {
+      ROS_FATAL_STREAM("Exception while creating octomap updater plugin loader " << ex.what());
+    }
+  }
+
+  // std::unique_ptr<SetupScreenWidget> up;
+  // try
+  // {
+  //   up.reset(widget_plugin_loader_->createUnmanagedInstance("moveit_setup_assistant/AuthorPlugin"));
+  // }
+  // catch (pluginlib::PluginlibException& ex)
+  // {
+  //   ROS_ERROR_STREAM("Exception while loading '" << "moveit_setup_assistant::AuthorPlugin" << "': " << ex.what()
+  //                                                                << std::endl);
+  // }
+
+  // raw_pointer = up.get();
+  // if(raw_pointer==NULL)
+  //   ROS_WARN_STREAM("raw pointer null");
+  // main_content_->addWidget(raw_pointer);
+  // SetupScreenWidget* ssw_ = qobject_cast<SetupScreenWidget*>(raw_pointer);
+  // main_content_->setCurrentWidget(ssw_);
+  // ssw_->focusGiven();
+  
+  // SetupScreenWidget* up2 = widget_plugin_loader_->createUnmanagedInstance("moveit_setup_assistant/AuthorPlugin");
+  // up2->setParentWidget_(parent, config_data_);
+  // main_content_->addWidget(up2);
+  // SetupScreenWidget* ssw_ = qobject_cast<SetupScreenWidget*>(up2);
+  // main_content_->setCurrentWidget(up2);
+  // ssw_->focusGiven();
+
+  // default_collisions_widget_ = new DefaultCollisionsWidget(this, config_data_);
+  // main_content_->addWidget(default_collisions_widget_);
+  // SetupScreenWidget* ssw_ = qobject_cast<SetupScreenWidget*>(default_collisions_widget_);
+  // ssw_->focusGiven();
+
 
   // Start Screen
   start_screen_widget_ = new StartScreenWidget(this, config_data_);
   start_screen_widget_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
   connect(start_screen_widget_, SIGNAL(readyToProgress()), this, SLOT(progressPastStartScreen()));
+
   connect(start_screen_widget_, SIGNAL(loadRviz()), this, SLOT(loadRviz()));
   main_content_->addWidget(start_screen_widget_);
 
@@ -225,11 +270,10 @@ void SetupAssistantWidget::moveToScreen(const int index)
 
     // Change screens
     main_content_->setCurrentIndex(index);
-
     // Send the focus given command to the screen widget
     ssw = qobject_cast<SetupScreenWidget*>(main_content_->widget(index));
+    ROS_WARN_STREAM(index);
     ssw->focusGiven();
-
     // Change navigation selected option
     navs_view_->setSelected(index);  // Select first item in list
   }
@@ -240,8 +284,6 @@ void SetupAssistantWidget::moveToScreen(const int index)
 // ******************************************************************************************
 void SetupAssistantWidget::progressPastStartScreen()
 {
-  // Load all widgets ------------------------------------------------
-
   // Self-Collisions
   default_collisions_widget_ = new DefaultCollisionsWidget(this, config_data_);
   main_content_->addWidget(default_collisions_widget_);
@@ -251,75 +293,88 @@ void SetupAssistantWidget::progressPastStartScreen()
           SLOT(highlightGroup(const std::string&)));
   connect(default_collisions_widget_, SIGNAL(unhighlightAll()), this, SLOT(unhighlightAll()));
 
-  // Virtual Joints
-  virtual_joints_widget_ = new VirtualJointsWidget(this, config_data_);
-  main_content_->addWidget(virtual_joints_widget_);
-  connect(virtual_joints_widget_, SIGNAL(isModal(bool)), this, SLOT(setModalMode(bool)));
-  connect(virtual_joints_widget_, SIGNAL(highlightLink(const std::string&, const QColor&)), this,
-          SLOT(highlightLink(const std::string&, const QColor&)));
-  connect(virtual_joints_widget_, SIGNAL(highlightGroup(const std::string&)), this,
-          SLOT(highlightGroup(const std::string&)));
-  connect(virtual_joints_widget_, SIGNAL(unhighlightAll()), this, SLOT(unhighlightAll()));
-  connect(virtual_joints_widget_, SIGNAL(referenceFrameChanged()), this, SLOT(virtualJointReferenceFrameChanged()));
+  if (!widget_plugin_loader_)
+  {
+    try
+    {
+      widget_plugin_loader_.reset(new pluginlib::ClassLoader<SetupScreenWidget>(
+          "moveit_setup_assistant", "SetupScreenWidget"));
+    }
+    catch (pluginlib::PluginlibException& ex)
+    {
+      ROS_FATAL_STREAM("Exception while creating octomap updater plugin loader " << ex.what());
+    }
+  }
 
-  // Planning Groups
-  planning_groups_widget = new PlanningGroupsWidget(this, config_data_);
-  main_content_->addWidget(planning_groups_widget);
-  connect(planning_groups_widget, SIGNAL(isModal(bool)), this, SLOT(setModalMode(bool)));
-  connect(planning_groups_widget, SIGNAL(highlightLink(const std::string&, const QColor&)), this,
-          SLOT(highlightLink(const std::string&, const QColor&)));
-  connect(planning_groups_widget, SIGNAL(highlightGroup(const std::string&)), this,
-          SLOT(highlightGroup(const std::string&)));
-  connect(planning_groups_widget, SIGNAL(unhighlightAll()), this, SLOT(unhighlightAll()));
+  SetupScreenWidget* up;
 
-  // Robot Poses
-  robot_poses_widget_ = new RobotPosesWidget(this, config_data_);
-  main_content_->addWidget(robot_poses_widget_);
-  connect(robot_poses_widget_, SIGNAL(isModal(bool)), this, SLOT(setModalMode(bool)));
-  connect(robot_poses_widget_, SIGNAL(highlightLink(const std::string&, const QColor&)), this,
-          SLOT(highlightLink(const std::string&, const QColor&)));
-  connect(robot_poses_widget_, SIGNAL(highlightGroup(const std::string&)), this,
-          SLOT(highlightGroup(const std::string&)));
-  connect(robot_poses_widget_, SIGNAL(unhighlightAll()), this, SLOT(unhighlightAll()));
 
-  // End Effectors
-  end_effectors_widget_ = new EndEffectorsWidget(this, config_data_);
-  main_content_->addWidget(end_effectors_widget_);
-  connect(end_effectors_widget_, SIGNAL(isModal(bool)), this, SLOT(setModalMode(bool)));
-  connect(end_effectors_widget_, SIGNAL(highlightLink(const std::string&, const QColor&)), this,
-          SLOT(highlightLink(const std::string&, const QColor&)));
-  connect(end_effectors_widget_, SIGNAL(highlightGroup(const std::string&)), this,
-          SLOT(highlightGroup(const std::string&)));
-  connect(end_effectors_widget_, SIGNAL(unhighlightAll()), this, SLOT(unhighlightAll()));
+  std::vector<std::string> classes = widget_plugin_loader_-> getDeclaredClasses();
+  ROS_WARN_STREAM(classes.size());
 
-  // Virtual Joints
-  passive_joints_widget_ = new PassiveJointsWidget(this, config_data_);
-  main_content_->addWidget(passive_joints_widget_);
-  connect(passive_joints_widget_, SIGNAL(isModal(bool)), this, SLOT(setModalMode(bool)));
-  connect(passive_joints_widget_, SIGNAL(highlightLink(const std::string&, const QColor&)), this,
-          SLOT(highlightLink(const std::string&, const QColor&)));
-  connect(passive_joints_widget_, SIGNAL(highlightGroup(const std::string&)), this,
-          SLOT(highlightGroup(const std::string&)));
-  connect(passive_joints_widget_, SIGNAL(unhighlightAll()), this, SLOT(unhighlightAll()));
+  for(size_t i = 0; i < classes.size(); i++)
+  {
+    ROS_WARN_STREAM(classes[i]);
+    try
+    {
+      up = widget_plugin_loader_->createUnmanagedInstance(classes[i]);
+    }
+    catch (pluginlib::PluginlibException& ex)
+    {
+      ROS_ERROR_STREAM("Exception while loading '" << "moveit_setup_assistant::AuthorPlugin" << "': " << ex.what()
+                                                                   << std::endl);
+    }
+    up->setParentWidget_(middle_frame_, config_data_);
+    main_content_->addWidget(up);
+  }
+  // // for(size_t i = 0; i < classes.size(); i++)
+  // // {
+  // //   ROS_WARN_STREAM(classes[i]);
+  // //   boost::shared_ptr<moveit_setup_assistant::SetupAssistantWidget> plugin = loader.createInstance<moveit_setup_assistant::SetupAssistantWidget>(classes[i]);
 
-  // Perception
-  perception_widget_ = new PerceptionWidget(this, config_data_);
-  main_content_->addWidget(perception_widget_);
-  connect(perception_widget_, SIGNAL(isModal(bool)), this, SLOT(setModalMode(bool)));
-  connect(perception_widget_, SIGNAL(highlightLink(const std::string&, const QColor&)), this,
-          SLOT(highlightLink(const std::string&, const QColor&)));
-  connect(perception_widget_, SIGNAL(highlightGroup(const std::string&)), this,
-          SLOT(highlightGroup(const std::string&)));
-  connect(perception_widget_, SIGNAL(unhighlightAll()), this, SLOT(unhighlightAll()));
+  // // QWidget* foo = new QWidget(this);
 
-  // Load author info plugin
-  class_loader::ClassLoader loader("libmoveit_author_plugin.so");
-  boost::shared_ptr<moveit_setup_assistant::SetupAssistantWidget> plugin = loader.createInstance<moveit_setup_assistant::SetupAssistantWidget>("moveit_setup_assistant/AuthorPlugin");
-  // plugin->initialize(this, config_data_);
+  // // foo = boost::dynamic_pointer_cast<QWid. get*>(plugin);
 
-  // Configuration Files
-  configuration_files_widget_ = new ConfigurationFilesWidget(this, config_data_);
-  main_content_->addWidget(configuration_files_widget_);
+
+  // // QWidget *q = dynamic_cast<QWidget*>(&plugin);
+  // // if (q != nullptr) {
+  // //     ROS_WARN_STREAM("You've got a BMW!");
+  // // }
+
+  // //   plugin->setParentWidget(this);
+  // //   ROS_WARN_STREAM("2");
+  // //   main_content_->addWidget(plugin->getWidget());
+  // //   ROS_WARN_STREAM("3");
+
+  // // moveit_setup_assistant::SetupAssistantWidget *raw_plugin = plugin.get();
+  // // main_content_->addWidget(raw_plugin);
+
+  // // }
+  // // boost::shared_ptr<moveit_setup_assistant::SetupAssistantWidget> plugin = loader.createInstance<moveit_setup_assistant::SetupAssistantWidget>("moveit_setup_assistant::AuthorPlugin");
+  // try {
+  // moveit_setup_assistant::SetupAssistantWidget* plugin_ = loader.createUnmanagedInstance <moveit_setup_assistant::SetupAssistantWidget>("moveit_setup_assistant::AuthorPlugin");
+  // }
+  // catch(pluginlib::PluginlibException& ex)
+  //    {
+  //    //handle the class failing to load
+  //    ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
+  // }
+  // // QWidget* foo = new QWidget(this);
+
+  // // foo = boost::dynamic_pointer_cast<QWid. get*>(plugin);
+
+
+  // // QWidget *q = dynamic_cast<QWidget*>(&plugin);
+  // // if (q != nullptr) {
+  // //     ROS_WARN_STREAM("You've got a BMW!");
+  // // }
+
+  // // plugin->setParentWidget(this);
+  // // main_content_->addWidget(plugin);
+
+  //   // moveit_setup_assistant::SetupAssistantWidget *raw_plugin = plugin.get();
+  //   // main_content_->addWidget(raw_plugin);
 
   // Enable all nav buttons -------------------------------------------
   for (int i = 0; i < nav_name_list_.count(); ++i)

@@ -39,6 +39,7 @@
 
 // Qt
 #include <QWidget>
+#include <QStackedLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QString>
@@ -49,27 +50,23 @@
 #include <QTimer>
 #include <QSplitter>
 #include <QStringList>
-// Setup Asst
-#include "navigation_widget.h"
-#include "start_screen_widget.h"
-#include "default_collisions_widget.h"
-#include "planning_groups_widget.h"
-#include "robot_poses_widget.h"
-#include "end_effectors_widget.h"
-#include "virtual_joints_widget.h"
-#include "passive_joints_widget.h"
-#include "author_information_widget.h"
-#include "configuration_files_widget.h"
-#include "perception_widget.h"
 
 #ifndef Q_MOC_RUN
 #include <moveit/setup_assistant/tools/moveit_config_data.h>
+
+#include "navigation_widget.h"
+#include "header_widget.h"
+#include "start_screen_widget.h"
+#include "default_collisions_widget.h"
 
 // Other
 #include <ros/ros.h>
 #include <boost/program_options.hpp>  // for parsing input arguments
 #include <boost/thread/mutex.hpp>
 #endif
+
+#include <pluginlib/class_loader.hpp>
+
 
 // Forward declarations
 namespace rviz
@@ -108,7 +105,8 @@ public:
    */
   ~SetupAssistantWidget();
 
-  void initialize(QWidget* parent, boost::program_options::variables_map args);
+  virtual void initialize(QWidget* parent, boost::program_options::variables_map args);
+  virtual void setParentWidget(QWidget* parent){};
 
   /**
    * Changes viewable screen
@@ -215,21 +213,16 @@ private:
   rviz::VisualizationManager* rviz_manager_;
   moveit_rviz_plugin::RobotStateDisplay* robot_state_display_;
 
-  // Screen Widgets
-  StartScreenWidget* start_screen_widget_;
-  DefaultCollisionsWidget* default_collisions_widget_;
-  PlanningGroupsWidget* planning_groups_widget;
-  RobotPosesWidget* robot_poses_widget_;
-  EndEffectorsWidget* end_effectors_widget_;
-  VirtualJointsWidget* virtual_joints_widget_;
-  PassiveJointsWidget* passive_joints_widget_;
-  AuthorInformationWidget* author_information_widget_;
-  ConfigurationFilesWidget* configuration_files_widget_;
-  PerceptionWidget* perception_widget_;
-
   /// Contains all the configuration data for the setup assistant
   moveit_setup_assistant::MoveItConfigDataPtr config_data_;
 
+  std::unique_ptr<pluginlib::ClassLoader<SetupScreenWidget> > widget_plugin_loader_;
+
+  // Screen Widgets
+  StartScreenWidget* start_screen_widget_;
+
+  DefaultCollisionsWidget* default_collisions_widget_;
+  SetupScreenWidget* raw_pointer;
   // ******************************************************************************************
   // Private Functions
   // ******************************************************************************************

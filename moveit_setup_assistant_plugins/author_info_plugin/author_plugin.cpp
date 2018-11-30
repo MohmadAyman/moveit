@@ -46,7 +46,7 @@
 
 // ROS
 // #include <srdfdom/model.h>  // use their struct datastructures
-// #include <ros/console.h>
+#include <ros/console.h>
 // #include <ros/ros.h>
 // Boost
 // #include <boost/algorithm/string.hpp>  // for trimming whitespace from user input
@@ -55,16 +55,12 @@
 
 namespace moveit_setup_assistant
 {
-  AuthorPlugin::AuthorPlugin() : SetupAssistantWidget()
-  {}
-
-  void AuthorPlugin::initialize(QWidget* parent, moveit_setup_assistant::MoveItConfigDataPtr config_data)
+  AuthorPlugin::AuthorPlugin()
   {
-    QVBoxLayout* layout = new QVBoxLayout();
+    QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignTop);
 
     // Top Header Area ------------------------------------------------
-
     HeaderWidget* header =
         new HeaderWidget("Author Information", "Specify contact information of the author and initial maintainer of the "
                                                 "generated package. catkin requires valid details in the package's "
@@ -88,11 +84,20 @@ namespace moveit_setup_assistant
     connect(email_edit_, SIGNAL(editingFinished()), this, SLOT(edited_email()));
     layout->addWidget(email_edit_);
 
-    config_data_ = config_data;
-
     // Finish Layout --------------------------------------------------
     this->setLayout(layout);
   }
+
+  // ******************************************************************************************
+  // Called when setup assistant navigation switches to this screen
+  // ******************************************************************************************
+  void AuthorPlugin::focusGiven()
+  {
+    // Allow list box to populate
+    this->name_edit_->setText(QString::fromStdString(config_data_->author_name_));
+    this->email_edit_->setText(QString::fromStdString(config_data_->author_email_));
+  }
+
 
   void AuthorPlugin::edited_name()
   {
@@ -102,9 +107,15 @@ namespace moveit_setup_assistant
 
   void AuthorPlugin::edited_email()
   {
-      config_data_->author_email_ = this->email_edit_->text().toStdString();
-  config_data_->changes |= MoveItConfigData::AUTHOR_INFO;
-
+    config_data_->author_email_ = this->email_edit_->text().toStdString();
+    config_data_->changes |= MoveItConfigData::AUTHOR_INFO;
   }
+
+  void AuthorPlugin::setParentWidget_(QWidget* parent, moveit_setup_assistant::MoveItConfigDataPtr config_data)
+  {
+    this->config_data_= config_data;
+    // this->setParent(parent);
+  }
+
 }  // namespace
-CLASS_LOADER_REGISTER_CLASS(moveit_setup_assistant::AuthorPlugin, moveit_setup_assistant::SetupAssistantWidget)
+CLASS_LOADER_REGISTER_CLASS(moveit_setup_assistant::AuthorPlugin, SetupScreenWidget)

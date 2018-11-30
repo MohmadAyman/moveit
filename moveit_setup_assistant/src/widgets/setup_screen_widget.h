@@ -38,7 +38,7 @@
 #define MOVEIT_ROS_MOVEIT_SETUP_ASSISTANT_WIDGETS_SETUP_SCREEN_WIDGET_
 
 #include <QWidget>
-
+#include <moveit/setup_assistant/tools/moveit_config_data.h>
 // ******************************************************************************************
 // Provides the title and instructions
 // ******************************************************************************************
@@ -47,7 +47,7 @@ class SetupScreenWidget : public QWidget
   Q_OBJECT
 
 public:
-  SetupScreenWidget(QWidget* parent) : QWidget(parent)
+  SetupScreenWidget()
   {
   }
 
@@ -57,6 +57,11 @@ public:
   /// function called when widget lost focus, allows to accept/reject changes and to reject switching (returning false)
   virtual bool focusLost();
 
+  void setParentWidget(QWidget* parent);
+
+  virtual void setParentWidget_(QWidget* parent, moveit_setup_assistant::MoveItConfigDataPtr config_data);
+
+  // virtual void setParentWidget_(QWidget* parent);
   // ******************************************************************************************
   // Emitted Signal Functions
   // ******************************************************************************************

@@ -63,19 +63,8 @@ set(HEADERS
   src/widgets/header_widget.h
   src/widgets/setup_assistant_widget.h
   src/widgets/start_screen_widget.h
-  src/widgets/planning_groups_widget.h
-  src/widgets/double_list_widget.h
-  src/widgets/kinematic_chain_widget.h
-  src/widgets/group_edit_widget.h
   src/widgets/default_collisions_widget.h
-  src/widgets/robot_poses_widget.h
-  src/widgets/end_effectors_widget.h
-  src/widgets/virtual_joints_widget.h
-  src/widgets/passive_joints_widget.h
-  src/widgets/perception_widget.h
-  src/widgets/configuration_files_widget.h
   src/widgets/setup_screen_widget.h
-  src/widgets/author_information_widget.h
 )
 
 # Tools Library
@@ -97,22 +86,11 @@ target_link_libraries(${PROJECT_NAME}_tools
 # Main Widgets Library - all screens (navigation options)
 add_library(${PROJECT_NAME}_widgets
   src/widgets/start_screen_widget.cpp
-  src/widgets/planning_groups_widget.cpp
-  src/widgets/double_list_widget.cpp
-  src/widgets/kinematic_chain_widget.cpp
-  src/widgets/group_edit_widget.cpp
   src/widgets/default_collisions_widget.cpp
-  src/widgets/robot_poses_widget.cpp
-  src/widgets/end_effectors_widget.cpp
-  src/widgets/virtual_joints_widget.cpp
-  src/widgets/passive_joints_widget.cpp
-  src/widgets/perception_widget.cpp
-  src/widgets/configuration_files_widget.cpp
   src/widgets/navigation_widget.cpp
   src/widgets/header_widget.cpp
   src/widgets/setup_assistant_widget.cpp
   src/widgets/setup_screen_widget.cpp
-  src/widgets/author_information_widget.cpp
   ${HEADERS}
 )
 set_target_properties(${PROJECT_NAME}_widgets PROPERTIES VERSION ${${PROJECT_NAME}_VERSION})
