@@ -556,7 +556,7 @@ bool MoveItConfigData::outputFakeControllersYAML(const std::string& file_path)
         emitter << YAML::Key << "pose";
         emitter << YAML::Value << group_state.name_;
         emitter << YAML::EndMap;
-        break;
+        break;  
       }
     }
   }

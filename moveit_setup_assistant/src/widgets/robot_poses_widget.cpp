@@ -42,7 +42,8 @@
 #include <QMessageBox>
 #include <QDoubleValidator>
 #include <QApplication>
-
+#include <QButtonGroup>
+#include <QRadioButton>
 #include <moveit/robot_state/conversions.h>
 #include <moveit_msgs/DisplayRobotState.h>
 
@@ -119,7 +120,7 @@ QWidget* RobotPosesWidget::createContentsWidget()
   // Table ------------ ------------------------------------------------
 
   data_table_ = new QTableWidget(this);
-  data_table_->setColumnCount(2);
+  data_table_->setColumnCount(3);
   data_table_->setSortingEnabled(true);
   data_table_->setSelectionBehavior(QAbstractItemView::SelectRows);
   connect(data_table_, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(editDoubleClicked(int, int)));
@@ -130,6 +131,7 @@ QWidget* RobotPosesWidget::createContentsWidget()
   QStringList header_list;
   header_list.append("Pose Name");
   header_list.append("Group Name");
+  header_list.append("Set As Default");
   data_table_->setHorizontalHeaderLabels(header_list);
 
   // Bottom Buttons --------------------------------------------------
@@ -737,6 +739,9 @@ void RobotPosesWidget::loadDataTable()
   // Set size of datatable
   data_table_->setRowCount(config_data_->srdf_->group_states_.size());
 
+  // // Group radio buttons
+  default_pose_buttons_ = new std::map<std::string, QButtonGroup*>;
+
   // Loop through every pose
   int row = 0;
   for (std::vector<srdf::Model::GroupState>::const_iterator data_it = config_data_->srdf_->group_states_.begin();
@@ -748,9 +753,27 @@ void RobotPosesWidget::loadDataTable()
     QTableWidgetItem* group_name = new QTableWidgetItem(data_it->group_.c_str());
     group_name->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
+    QRadioButton* radio_btn;
+    radio_btn = new QRadioButton("");
+
+    std::map<std::string, QButtonGroup*>::const_iterator it = default_pose_buttons_->find(data_it->group_.c_str());
+    if (it != default_pose_buttons_->end())
+    {
+      // Group of radio buttons already exists
+      (*default_pose_buttons_)[data_it->group_.c_str()]->addButton(radio_btn, row);
+    }
+    else
+    {
+      (*default_pose_buttons_)[data_it->group_.c_str()] = new QButtonGroup(this);
+    }
+
+    radio_btn->setChecked(true);
+    connect((*default_pose_buttons_)[data_it->group_.c_str()], SIGNAL(buttonClicked(int)), this, SLOT(setDefaultPose()));
+  
     // Add to table
     data_table_->setItem(row, 0, data_name);
     data_table_->setItem(row, 1, group_name);
+    data_table_->setCellWidget(row, 2, radio_btn);
 
     // Increment counter
     ++row;
@@ -767,6 +790,22 @@ void RobotPosesWidget::loadDataTable()
   // Show edit button if applicable
   if (!config_data_->srdf_->group_states_.empty())
     btn_edit_->show();
+}
+
+
+// ******************************************************************************************
+// Displays data in the link_pairs_ data structure into a QtTableWidget
+// ******************************************************************************************
+void RobotPosesWidget::setDefaultPose()
+{
+  std::map<std::string, QButtonGroup*>::iterator it;
+
+  for ( it = default_pose_buttons_->begin(); it != default_pose_buttons_->end(); it++ )
+  {
+    int row = (*default_pose_buttons_)[it->first]->checkedId();
+    config_data_->group_meta_data_[it->first].default_pose_ = data_table_->item(row, 0)->text().toStdString();
+  }
+
 }
 
 // ******************************************************************************************

@@ -70,6 +70,7 @@ struct GroupMetaData
   double kinematics_solver_search_resolution_;  // resolution to use with solver
   double kinematics_solver_timeout_;            // solver timeout
   std::string default_planner_;                 // Name of the default planner to use
+  std::string default_pose_;
 };
 
 /**

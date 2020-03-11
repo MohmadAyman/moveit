@@ -42,6 +42,7 @@
 #include <QHBoxLayout>
 #include <QScrollArea>
 #include <QGroupBox>
+#include <QRadioButton>
 #include <QLabel>
 #include <QPushButton>
 #include <QTableWidget>
@@ -93,6 +94,7 @@ public:
   QWidget* pose_list_widget_;
   QWidget* pose_edit_widget_;
   QLabel* collision_warning_;
+  std::map<std::string, QButtonGroup*>* default_pose_buttons_;
 
 private Q_SLOTS:
 
@@ -129,6 +131,10 @@ private Q_SLOTS:
 
   /// Play through the poses
   void playPoses();
+
+  // Set default pose
+  void setDefaultPose();
+
 
   /**
    * Call when one of the sliders has its value changed to store its value in kinematic model
